@@ -1,29 +1,36 @@
-<!-- div class="card-deck" >
-  <div class="col-md-{{_columnWidthBootstrapGrid}}" *ngFor="let image of group">
-    <div class="card">
-      <img class="card-img" [src]="image.url" [alt]="image.title">
+
+<div class="card-group mb-sm-3">
+  <div class="card shadow-0" [ngClass]="{'border-right-0': _imagePreviewed !== null}">
+    <div class="card-header bg-white header-elements-sm-inline">
+      <h6 class="card-title">Seleccione un archivo</h6>
+      <div class="header-elements">
+        <div class="form-group mb-0">
+          <input type="text" class="form-control wmin-200" [(ngModel)]="_textFilter" placeholder="Buscar..." (input)="onFilterUpdated($event.target.value)">
+        </div>
+      </div>
     </div>
-  </div>
-</div -->
-<div class="card-group mb-sm-3" style="height: 300px;">
-  <div class="card border-right-0 shadow-0" style="height: 300px;">
-      <ul class="list-group list-group-flush  border-top overflow-auto">
-        <a (click)="onPreviewImage(image)" class="list-group-item list-group-item-action pointer" *ngFor="let image of _images">
+    <ul class="list-group list-group-flush  border-top overflow-auto" [ngStyle]="{'height': height}">
+      <ng-template ngFor let-image [ngForOf]="_images">
+        <a (click)="onPreviewImage(image)" class="list-group-item list-group-item-action pointer" *ngIf="!image.hidden" [ngClass]="{'bg-orange-300': image.selected}">
           <span class="font-weight-semibold">
-            <i class="icon-file-empty2 mr-2"></i>{{getFileName(image.url)}}
+            <i class="icon-file-empty2 mr-2"></i>{{image.title}}
           </span>
         </a>
-      </ul>
-  </div>
-  <div class="card border-right-0 shadow-0" *ngIf="_imagePreviewed !== null" style="height: 300px;">
-      <img class="card-img-top img-fluid" [src]="_imagePreviewed.url" [alt]="_imagePreviewed.title">
-      <div class="card-body">
-        <p class="card-text">{{getFileName(_imagePreviewed.url)}}</p>
-      </div>
-      <div class="card-footer">
-        <div class="input-group">
-            <button class="btn bg-blue" type="button"><i class="icon-select2"></i>Seleccionar</button>
-        </div>
-        </div>
+      </ng-template>
+    </ul>
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+      <input type="file" #inputFile ng2FileSelect [uploader]="fileUploader" />
+      <button type="button" class="btn btn-success btn-s"
+                (click)="fileUploader.uploadAll()" [disabled]="!fileUploader.getNotUploadedItems().length || fileUploader.isUploading">
+            <i [ngClass]="{'icon-spinner2 spinner':fileUploader.isUploading, 'icon-file-upload': !fileUploader.isUploading}"></i> Cargar
+        </button>
     </div>
+  </div>
+  <div class="card  shadow-0" *ngIf="_imagePreviewed !== null">
+    <div class="card-body text-center" [ngStyle]="{'background-image': 'url(\'' + _imagePreviewed.url + '\')', 'background-size': 'contain', 'background-repeat': 'no-repeat', 'background-position': 'center' }">
+    </div>
+    <div class="card-footer text-center">
+      <button class="btn bg-blue" type="button"><i class="icon-select2"></i>Seleccionar</button>
+    </div>
+  </div>
 </div>

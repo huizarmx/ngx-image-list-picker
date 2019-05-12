@@ -1,14 +1,35 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, AfterViewInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { IImageDefinition } from '..';
+import { FileUploader, FileUploaderOptions, FileItem, ParsedResponseHeaders } from 'ng2-file-upload';
+import { IFileUploadOptions } from './model';
+
+export class ImageModel implements IImageDefinition {
+  url: string;
+  title: string;
+  selected: boolean;
+  hidden: boolean;
+  constructor(imageDefinition: IImageDefinition) {
+    this.url = imageDefinition.url;
+    this.title = imageDefinition.title;
+    this.selected = false;
+    this.hidden = false;
+  }
+}
 
 @Component({
   selector: 'ngx-image-list-picker',
   templateUrl: './ngx-image-list-picker.template.html'
 })
-export class NgxImageListPickerComponent {
+export class NgxImageListPickerComponent implements AfterViewInit {
+
+  /** The original collection of images */
+  private _sourceImages = new Array<ImageModel>();
+
+  /** The text filter to apply to the collection of images */
+  private _textFilter = "";
 
   /** The collection of images to display in the component */
-  private _images = new Array<IImageDefinition>();
+  private _images = new Array<ImageModel>();
 
   /** The images grouped as needed to be displayed on screen */
   private _groupedImages = new Array<Array<IImageDefinition>>();
@@ -35,18 +56,70 @@ export class NgxImageListPickerComponent {
   private _totalImages = 1;
 
   /** The image being previewed by the user */
-  private _imagePreviewed: IImageDefinition = null;
+  private _imagePreviewed: ImageModel = null;
+
+  /** The file uploader to use */
+  private fileUploader: FileUploader;
+
+  /** A reference to the input control that allows the user to upload files*/
+  @ViewChild('inputFile')
+  public inputFile: ElementRef;
 
   /** Will be triggered when the user picks an image from the list */
   @Output()
   public imageSelected= new EventEmitter<IImageDefinition>();
+
+  /** Will be triggered when the users uploads successfully an image */
+  @Output()
+  public fileUploadSucceded = new EventEmitter<any>();
+
+  /** Will be triggered when the users clicks outside of the component */
+  @Output()
+  public blur = new EventEmitter<any>();
+
+  /** The height expressed as a valid css value */
+  @Input()
+  height = "300px";
+
+  /** The options to configure the file uploader */
+  @Input()
+  set options(options: IFileUploadOptions) {
+    const fileUploaderOptions: FileUploaderOptions = {
+      url: options.url,
+      headers: [{ name: 'Accept', value: 'application/json' }]
+    }
+    if(options.getToken) {
+      fileUploaderOptions.authToken = "Bearer " + options.getToken();
+      fileUploaderOptions.authTokenHeader = "Authorization";
+    }
+    if(options.parametersToAdd) {
+      fileUploaderOptions.additionalParameter = {};
+      options.parametersToAdd.forEach((value, key) => {
+        fileUploaderOptions.additionalParameter[key] = value;
+      });
+    }
+    const  self = this;
+    this.fileUploader = new class FileUploaderExt extends FileUploader {
+      onCompleteAll() {
+        if(self.inputFile) {
+          self.inputFile.nativeElement.value = "";
+        }
+
+      }
+      public onSuccessItem(item: FileItem, response: string, status: number, headers: ParsedResponseHeaders): any {
+        console.log(response);
+        self.fileUploadSucceded.emit(response);
+        return { item, response, status, headers };
+      }
+    }(fileUploaderOptions);
+  };
 
   /**
    * The collection of images to display in the component
    */
   @Input()
   get images(): Array<IImageDefinition> {
-    return this.images;
+    return this._sourceImages;
   }
 
   /**
@@ -58,10 +131,12 @@ export class NgxImageListPickerComponent {
     if(!images || images === null || !images.length) {
       images = new Array<IImageDefinition>();
     }
-
-    this._images = images;
+    this._sourceImages = new Array<ImageModel>();
+    images.forEach(image => this._sourceImages.push(new ImageModel(image)));
     this._currentPage = 1;
     this._groupedImages = this.groupImages(this.paginate(this._currentPage), this._numberOfColumns);
+    this._imagePreviewed = null;
+    this.sortAndFilterCollection();
   }
 
   /**
@@ -94,12 +169,76 @@ export class NgxImageListPickerComponent {
   }
 
   /**
+   * Constructor por defecto de la clase NgxImageListPickerComponent
+   *
+   * @param elementRef una referencia al elemento que contiene este componente.
+   */
+  constructor(private elementRef: ElementRef) {
+  }
+
+  /**
+   * Manejador del evento clic a nivel del documento.
+   *
+   * @param event el evento que disparó esta invocación.
+   * @param targetElement el elemento que recibió el clic
+   */
+  @HostListener('document:click', ['$event', '$event.target'])
+  public onClick(event: MouseEvent, targetElement: HTMLElement): void {
+      if (!targetElement) {
+          return;
+      }
+      const clickedInside = this.elementRef.nativeElement.contains(targetElement);
+      if (!clickedInside) {
+          this.blur.emit();
+      }
+  }
+
+  ngAfterViewInit() {
+  }
+
+  /**
+   * Sets the currently selected image if this is a member of the collection of images
+   *
+   * @param image the image to set as the currently one selected
+   */
+  public setSelectedImage(image: IImageDefinition) {
+    this._textFilter = "";
+    if(this._images) {
+      this._images.forEach(anImage => {
+        if(image.url === anImage.url) {
+          anImage.selected = true;
+          this._imagePreviewed = anImage;
+        } else {
+          anImage.selected = false;
+        }
+      });
+    }
+  }
+
+  /**
+   * Handler of the change event for the filter field
+   */
+  private onFilterUpdated() {
+    this.sortAndFilterCollection();
+  }
+
+
+  /**
    * Handler of the click event for every element in the list of files
    *
    * @param image the image selected for preview
    */
-  private onPreviewImage(image: IImageDefinition) {
-    this._imagePreviewed = image;
+  private onPreviewImage(image: ImageModel) {
+    if(this._images) {
+        this._images.forEach(anImage => {
+            if(image.url === anImage.url) {
+              anImage.selected = true;
+              this._imagePreviewed = anImage;
+            } else {
+              anImage.selected = false;
+            }
+        });
+    }
   }
 
   /**
@@ -112,12 +251,20 @@ export class NgxImageListPickerComponent {
   }
 
   /**
-   * Gets the filename of a url
-   *
-   * @param url the url to review
+   * Sorts the images by the title and then applies the current filter
    */
-  private getFileName(url: string): string {
-    return url.substring(url.lastIndexOf('/')+1);
+  private sortAndFilterCollection() {
+    this._sourceImages = this._sourceImages.sort((a: IImageDefinition, b: IImageDefinition) => {
+      return a.title.toLocaleLowerCase().localeCompare(b.title.toLocaleLowerCase());
+    });
+    this._sourceImages.forEach(image => {
+      if(this._textFilter && this._textFilter !== '') {
+        image.hidden = image.title.toLocaleLowerCase().search(this._textFilter.toLocaleLowerCase()) === -1;
+      } else {
+        image.hidden = false;
+      }
+    });
+    this._images = this._sourceImages;
   }
 
   /**
