@@ -1,0 +1,21 @@
+{
+  "npmScope": "image-picker-ws",
+  "implicitDependencies": {
+    "angular.json": "*",
+    "package.json": "*",
+    "tsconfig.json": "*",
+    "tslint.json": "*",
+    "nx.json": "*"
+  },
+  "projects": {
+    "demo": {
+      "tags": []
+    },
+    "demo-e2e": {
+      "tags": []
+    },
+    "ngx-image-list-picker": {
+      "tags": []
+    }
+  }
+}

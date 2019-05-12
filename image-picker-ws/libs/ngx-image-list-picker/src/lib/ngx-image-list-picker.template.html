@@ -1,0 +1,29 @@
+<!-- div class="card-deck" >
+  <div class="col-md-{{_columnWidthBootstrapGrid}}" *ngFor="let image of group">
+    <div class="card">
+      <img class="card-img" [src]="image.url" [alt]="image.title">
+    </div>
+  </div>
+</div -->
+<div class="card-group mb-sm-3" style="height: 300px;">
+  <div class="card border-right-0 shadow-0" style="height: 300px;">
+      <ul class="list-group list-group-flush  border-top overflow-auto">
+        <a (click)="onPreviewImage(image)" class="list-group-item list-group-item-action pointer" *ngFor="let image of _images">
+          <span class="font-weight-semibold">
+            <i class="icon-file-empty2 mr-2"></i>{{getFileName(image.url)}}
+          </span>
+        </a>
+      </ul>
+  </div>
+  <div class="card border-right-0 shadow-0" *ngIf="_imagePreviewed !== null" style="height: 300px;">
+      <img class="card-img-top img-fluid" [src]="_imagePreviewed.url" [alt]="_imagePreviewed.title">
+      <div class="card-body">
+        <p class="card-text">{{getFileName(_imagePreviewed.url)}}</p>
+      </div>
+      <div class="card-footer">
+        <div class="input-group">
+            <button class="btn bg-blue" type="button"><i class="icon-select2"></i>Seleccionar</button>
+        </div>
+        </div>
+    </div>
+</div>

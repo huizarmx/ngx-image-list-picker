@@ -1,0 +1,7 @@
+{
+  "extends": "../../tslint.json",
+  "rules": {
+    "directive-selector": [true, "attribute", "image-picker-ws", "camelCase"],
+    "component-selector": [true, "element", "image-picker-ws", "kebab-case"]
+  }
+}
