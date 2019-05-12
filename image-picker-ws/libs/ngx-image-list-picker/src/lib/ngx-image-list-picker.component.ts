@@ -23,43 +23,43 @@ export class ImageModel implements IImageDefinition {
 export class NgxImageListPickerComponent implements AfterViewInit {
 
   /** The original collection of images */
-  private _sourceImages = new Array<ImageModel>();
+  public _sourceImages = new Array<ImageModel>();
 
   /** The text filter to apply to the collection of images */
-  private _textFilter = "";
+  public _textFilter = "";
 
   /** The collection of images to display in the component */
-  private _images = new Array<ImageModel>();
+  public _images = new Array<ImageModel>();
 
   /** The images grouped as needed to be displayed on screen */
-  private _groupedImages = new Array<Array<IImageDefinition>>();
+  public _groupedImages = new Array<Array<IImageDefinition>>();
 
   /** The number of columns to present to the user */
-  private _numberOfColumns = 6;
+  public _numberOfColumns = 6;
 
   /** The number of rows to present to the user */
-  private _numberOfRows = 3;
+  public _numberOfRows = 3;
 
   /** The number to use as width in terms of the bootstrap grid system */
-  private _columnWidthBootstrapGrid = 2;
+  public _columnWidthBootstrapGrid = 2;
 
   /** The size of the page of images to present to the user at the same time */
-  private _pageSize = 18;
+  public _pageSize = 18;
 
   /** The current page of images being presented to the user */
-  private _currentPage = 1;
+  public _currentPage = 1;
 
   /** The number of pages available given the current collection of images */
-  private _totalPages = 1;
+  public _totalPages = 1;
 
   /** The total number of images contained in the collection of images */
-  private _totalImages = 1;
+  public _totalImages = 1;
 
   /** The image being previewed by the user */
-  private _imagePreviewed: ImageModel = null;
+  public _imagePreviewed: ImageModel = null;
 
   /** The file uploader to use */
-  private fileUploader: FileUploader;
+  public fileUploader: FileUploader;
 
   /** A reference to the input control that allows the user to upload files*/
   @ViewChild('inputFile')
@@ -218,7 +218,7 @@ export class NgxImageListPickerComponent implements AfterViewInit {
   /**
    * Handler of the change event for the filter field
    */
-  private onFilterUpdated() {
+  public onFilterUpdated() {
     this.sortAndFilterCollection();
   }
 
@@ -228,7 +228,7 @@ export class NgxImageListPickerComponent implements AfterViewInit {
    *
    * @param image the image selected for preview
    */
-  private onPreviewImage(image: ImageModel) {
+  public onPreviewImage(image: ImageModel) {
     if(this._images) {
         this._images.forEach(anImage => {
             if(image.url === anImage.url) {
@@ -246,7 +246,7 @@ export class NgxImageListPickerComponent implements AfterViewInit {
    *
    * @param image the image that was selected by the user
    */
-  private onImageSelected(image: IImageDefinition) {
+  public onImageSelected(image: IImageDefinition) {
     this.imageSelected.emit(image);
   }
 
