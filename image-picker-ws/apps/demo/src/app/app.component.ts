@@ -21,14 +21,17 @@ export class OperationResult<T> {
 })
 export class AppComponent {
 
-  @ViewChild('imageListPicker')
   imageListPicker: NgxImageListPickerComponent;
 
   title = 'demo';
 
   options: IFileUploadOptions = {
     url: 'https://admin-rest-web20190408042814.azurewebsites.net/api/FileUpload?code=D9frRBd4N362FDk6DunWWoQDcaSjeEouCzIC4OzaIozawIWe7mHVWQ==',
-    getToken: () => 'eyJraWQiOiJFT0NmZFgwM3Y0Rmw1aThwTFl6ejE0enBScTNQYVk0V3EwSWNNMXRRekx3IiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULjdnRVIzaVlyelJuVVFtbVpMeXphbjZwdm83UENmNDlDRXhpc09RY1FvQmMiLCJpc3MiOiJodHRwczovL2Rldi01NzIyMDQub2t0YXByZXZpZXcuY29tL29hdXRoMi9kZWZhdWx0IiwiYXVkIjoiYXBpOi8vZGVmYXVsdCIsImlhdCI6MTU1NzYyMzUxMywiZXhwIjoxNTU3NzA5OTEzLCJjaWQiOiIwb2FqcmIxYmh1ck9Sb05QbzBoNyIsInVpZCI6IjAwdWZuODdtazJpazgzdzQ4MGg3Iiwic2NwIjpbIm9wZW5pZCIsImVtYWlsIiwicHJvZmlsZSJdLCJzdWIiOiJqdWFuLm1leGljYUAyaHNvZnR3YXJlLmNvbS5teCJ9.Z4qb0k_VBT7ZOy7KLwQG5_Gd_hVgzddFvTLAXGuzYoR08ZwLbpG9S11HaCl63W_qL6zNoAvAFB_0HsDOLja2Wfy5I8fyuB4ZpMuu5t-qmnj9CnOE5s_hEl3eMb7jjfP5fUIu7pKfsqKSAHOyz3bkt1v7aA6oh5EzbGliHa7ZjlAFnKpJW2TR31_qaF7KPm9k16fSUS7MQl5hh8g4aBNGpTRWJQnyvoxaG9C0IoyHtLmWIAwqySxVdnPN1IFjmnwtvLyT_2aJOoFTF5ezgKni-feLij1i6_96d0tXWVvbA4pNAfPgYWynwDHgnEXXihc19Q8tXqBURxjLUptp13aBfw',
+    getToken: () => {
+      return new Promise<string>((resolve: (value?: string) => void, reject: (reason?: any) => void) => {
+        resolve('eyJraWQiOiJFT0NmZFgwM3Y0Rmw1aThwTFl6ejE0enBScTNQYVk0V3EwSWNNMXRRekx3IiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULlZ5TjU2WUx0SDlhNTBsalVMTGo3Q1U3eVRvVEtNYnRrQ25zdTZnTFcyclEiLCJpc3MiOiJodHRwczovL2Rldi01NzIyMDQub2t0YXByZXZpZXcuY29tL29hdXRoMi9kZWZhdWx0IiwiYXVkIjoiYXBpOi8vZGVmYXVsdCIsImlhdCI6MTU1NzcxMDE2OCwiZXhwIjoxNTU3Nzk2NTY4LCJjaWQiOiIwb2FqcmIxYmh1ck9Sb05QbzBoNyIsInVpZCI6IjAwdWZuODdtazJpazgzdzQ4MGg3Iiwic2NwIjpbInByb2ZpbGUiLCJvcGVuaWQiLCJlbWFpbCJdLCJzdWIiOiJqdWFuLm1leGljYUAyaHNvZnR3YXJlLmNvbS5teCJ9.t_29Ugc6peV2kaICRP8Jlqq3k8BUa5AC-w4u3-0eZWW6oJ3mSbtjzki_oKdT2SZmTx78a3lAw5snGYRchOcKGIbgXPMT8AAQAHNz3dkWddxPcPwaVo-oox71zYuxnT99eLWqiVNok2URPJJIVj6yjKmSdncXgH-ge4tSRIKB0xVuFjIvmnMdyKCdkyEQTiDEOlWfG5ssGTR2UgkY5WxfUlty9pXxJ95EbJMtFm_oWMEeBGcWxn9D_c3qauSBv4JjF0iE8US5JZtVNFXD4R9CpNs8UmxC7jpl5l5wT5XwNG_w8p_jGVUkrzD-GMg8dYkNLCrtd8uwUqwDUPbUXJ0BOQ');
+      });
+    },
     parametersToAdd: new Map([['path','upload/taxonomia-equipo-bmv']])
   }
 
@@ -49,6 +52,14 @@ export class AppComponent {
 
   public onBlur() {
     console.log('blur!');
+  }
+
+  public onImageSelected(image: IImageDefinition) {
+    console.log(image.url);
+  }
+
+  public onImagePickerInit(imagePickerComponent: NgxImageListPickerComponent) {
+    this.imageListPicker = imagePickerComponent;
   }
 
   public onFileUploaded(response: any) {

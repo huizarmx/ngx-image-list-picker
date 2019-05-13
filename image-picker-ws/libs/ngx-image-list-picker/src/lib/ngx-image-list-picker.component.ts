@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, AfterViewInit, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, AfterViewInit, ViewChild, ElementRef, HostListener, OnInit } from '@angular/core';
 import { IImageDefinition } from '..';
 import { FileUploader, FileUploaderOptions, FileItem, ParsedResponseHeaders } from 'ng2-file-upload';
 import { IFileUploadOptions } from './model';
@@ -20,7 +20,7 @@ export class ImageModel implements IImageDefinition {
   selector: 'ngx-image-list-picker',
   templateUrl: './ngx-image-list-picker.template.html'
 })
-export class NgxImageListPickerComponent implements AfterViewInit {
+export class NgxImageListPickerComponent implements OnInit {
 
   /** The original collection of images */
   public _sourceImages = new Array<ImageModel>();
@@ -77,6 +77,10 @@ export class NgxImageListPickerComponent implements AfterViewInit {
   @Output()
   public blur = new EventEmitter<any>();
 
+  /** Will be triggered when the component has completed its initialization */
+  @Output()
+  public init = new EventEmitter<NgxImageListPickerComponent>();
+
   /** The height expressed as a valid css value */
   @Input()
   height = "300px";
@@ -84,34 +88,36 @@ export class NgxImageListPickerComponent implements AfterViewInit {
   /** The options to configure the file uploader */
   @Input()
   set options(options: IFileUploadOptions) {
-    const fileUploaderOptions: FileUploaderOptions = {
-      url: options.url,
-      headers: [{ name: 'Accept', value: 'application/json' }]
-    }
-    if(options.getToken) {
-      fileUploaderOptions.authToken = "Bearer " + options.getToken();
-      fileUploaderOptions.authTokenHeader = "Authorization";
-    }
-    if(options.parametersToAdd) {
-      fileUploaderOptions.additionalParameter = {};
-      options.parametersToAdd.forEach((value, key) => {
-        fileUploaderOptions.additionalParameter[key] = value;
-      });
-    }
-    const  self = this;
-    this.fileUploader = new class FileUploaderExt extends FileUploader {
-      onCompleteAll() {
-        if(self.inputFile) {
-          self.inputFile.nativeElement.value = "";
-        }
+    options.getToken().then((token) => {
+      const fileUploaderOptions: FileUploaderOptions = {
+        url: options.url,
+        headers: [{ name: 'Accept', value: 'application/json' }]
+      }
+      if(options.getToken) {
+        fileUploaderOptions.authToken = "Bearer " + token
+        fileUploaderOptions.authTokenHeader = "Authorization";
+      }
+      if(options.parametersToAdd) {
+        fileUploaderOptions.additionalParameter = {};
+        options.parametersToAdd.forEach((value, key) => {
+          fileUploaderOptions.additionalParameter[key] = value;
+        });
+      }
+      const  self = this;
+      this.fileUploader = new class FileUploaderExt extends FileUploader {
+        onCompleteAll() {
+          if(self.inputFile) {
+            self.inputFile.nativeElement.value = "";
+          }
 
-      }
-      public onSuccessItem(item: FileItem, response: string, status: number, headers: ParsedResponseHeaders): any {
-        console.log(response);
-        self.fileUploadSucceded.emit(response);
-        return { item, response, status, headers };
-      }
-    }(fileUploaderOptions);
+        }
+        public onSuccessItem(item: FileItem, response: string, status: number, headers: ParsedResponseHeaders): any {
+          console.log(response);
+          self.fileUploadSucceded.emit(response);
+          return { item, response, status, headers };
+        }
+      }(fileUploaderOptions);
+    });
   };
 
   /**
@@ -193,7 +199,8 @@ export class NgxImageListPickerComponent implements AfterViewInit {
       }
   }
 
-  ngAfterViewInit() {
+  ngOnInit() {
+    this.init.emit(this);
   }
 
   /**

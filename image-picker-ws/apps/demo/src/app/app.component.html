@@ -24,4 +24,4 @@
   </li>
 </ul>
 
-<ngx-image-list-picker #imageListPicker [images]="images" [options]="options" (fileUploadSucceded)="onFileUploaded($event)" (blur)="onBlur()"></ngx-image-list-picker>
+<ngx-image-list-picker #imageListPicker [images]="images" [options]="options" (fileUploadSucceded)="onFileUploaded($event)" (imageSelected)="onImageSelected($event)" (init)="onImagePickerInit($event)" (blur)="onBlur()"></ngx-image-list-picker>

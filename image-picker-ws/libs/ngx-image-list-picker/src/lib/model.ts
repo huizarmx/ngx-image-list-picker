@@ -18,5 +18,5 @@ export interface IImageDefinition {
 export interface IFileUploadOptions {
   url: string;
   parametersToAdd: Map<string, string>;
-  getToken: () => string;
+  getToken: () => Promise<string>;
 }

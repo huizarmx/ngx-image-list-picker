@@ -20,7 +20,7 @@
     </ul>
     <div class="card-footer bg-white d-flex justify-content-between align-items-center">
       <input type="file" #inputFile ng2FileSelect [uploader]="fileUploader" />
-      <button type="button" class="btn btn-success btn-s"
+      <button type="button" class="btn btn-success btn-s" *ngIf="fileUploader"
                 (click)="fileUploader.uploadAll()" [disabled]="!fileUploader.getNotUploadedItems().length || fileUploader.isUploading">
             <i [ngClass]="{'icon-spinner2 spinner':fileUploader.isUploading, 'icon-file-upload': !fileUploader.isUploading}"></i> Cargar
         </button>
@@ -30,7 +30,7 @@
     <div class="card-body text-center" [ngStyle]="{'background-image': 'url(\'' + _imagePreviewed.url + '\')', 'background-size': 'contain', 'background-repeat': 'no-repeat', 'background-position': 'center' }">
     </div>
     <div class="card-footer text-center">
-      <button class="btn bg-blue" type="button"><i class="icon-select2"></i>Seleccionar</button>
+      <button class="btn bg-blue" type="button" (click)="onImageSelected(_imagePreviewed)"><i class="icon-select2"></i>Seleccionar</button>
     </div>
   </div>
 </div>
