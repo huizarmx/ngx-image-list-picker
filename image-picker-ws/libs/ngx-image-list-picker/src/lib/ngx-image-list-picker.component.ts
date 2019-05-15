@@ -90,7 +90,7 @@ export class NgxImageListPickerComponent implements OnInit {
   set options(options: IFileUploadOptions) {
     options.getToken().then((token) => {
       const fileUploaderOptions: FileUploaderOptions = {
-        url: options.url,
+        url: options.uploadFileUrl,
         headers: [{ name: 'Accept', value: 'application/json' }]
       }
       if(options.getToken) {
